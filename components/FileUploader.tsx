@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { UploadCloud, FileType, AlertCircle } from 'lucide-react';
+import { UploadCloud, AlertCircle, FileSpreadsheet } from 'lucide-react';
 
 interface FileUploaderProps {
   onFileSelect: (file: File) => void;
@@ -40,7 +40,7 @@ export const FileUploader: React.FC<FileUploaderProps> = ({ onFileSelect, isLoad
       "application/vnd.ms-excel" // xls
     ];
     
-    // Basic MIME check (some browsers might be loose with this, so extension check is also good practice)
+    // Basic MIME check
     const isExcel = validTypes.includes(file.type) || file.name.endsWith('.xlsx') || file.name.endsWith('.xls');
 
     if (isExcel) {
@@ -51,20 +51,20 @@ export const FileUploader: React.FC<FileUploaderProps> = ({ onFileSelect, isLoad
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto mb-8">
+    <div className="w-full">
       <div
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         className={`
           relative flex flex-col items-center justify-center w-full h-64 
-          border-2 border-dashed rounded-xl transition-all duration-300
-          ${isLoading ? 'bg-slate-50 border-slate-300 cursor-wait opacity-70' : 'bg-white border-slate-300 hover:border-blue-500 hover:bg-blue-50 cursor-pointer'}
-          ${error ? 'border-red-300 bg-red-50' : ''}
+          border-2 border-dashed rounded-xl transition-all duration-300 group
+          ${isLoading ? 'bg-slate-50 border-slate-200 cursor-wait opacity-75' : 'bg-slate-50/50 border-slate-300 hover:border-blue-500 hover:bg-blue-50/50 cursor-pointer'}
+          ${error ? 'border-red-300 bg-red-50/50' : ''}
         `}
       >
         <input
           type="file"
-          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-wait"
+          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-wait z-10"
           onChange={handleFileInput}
           accept=".xlsx, .xls"
           disabled={isLoading}
@@ -72,26 +72,31 @@ export const FileUploader: React.FC<FileUploaderProps> = ({ onFileSelect, isLoad
         
         <div className="flex flex-col items-center justify-center pt-5 pb-6 pointer-events-none">
           {isLoading ? (
-             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+             <div className="relative">
+                <div className="w-16 h-16 border-4 border-blue-100 rounded-full animate-pulse"></div>
+                <div className="absolute top-0 left-0 w-16 h-16 border-4 border-blue-600 rounded-full animate-spin border-t-transparent"></div>
+             </div>
           ) : (
-            <UploadCloud className={`w-12 h-12 mb-4 ${error ? 'text-red-500' : 'text-slate-400'}`} />
+            <div className="p-4 bg-white rounded-full shadow-sm mb-4 group-hover:scale-110 transition-transform duration-300">
+                <UploadCloud className={`w-8 h-8 ${error ? 'text-red-500' : 'text-blue-600'}`} />
+            </div>
           )}
           
-          <p className="mb-2 text-sm text-slate-600 font-medium">
-            {isLoading ? 'Processando planilha...' : 'Clique para enviar ou arraste o arquivo'}
+          <p className="mb-2 text-lg text-slate-700 font-semibold">
+            {isLoading ? 'Processando...' : 'Clique ou arraste sua planilha'}
           </p>
-          <p className="text-xs text-slate-500">
-            Suporta .XLSX ou .XLS
+          <p className="text-sm text-slate-500">
+            Suporta arquivos .XLSX ou .XLS
           </p>
         </div>
       </div>
 
       {error && (
-        <div className="mt-4 p-4 bg-red-50 border border-red-100 rounded-lg flex items-start gap-3">
+        <div className="mt-6 p-4 bg-red-50 border border-red-100 rounded-lg flex items-start gap-3 animate-in slide-in-from-top-2">
           <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
           <div>
-            <h3 className="text-sm font-semibold text-red-800">Erro ao processar</h3>
-            <p className="text-sm text-red-700 mt-1">{error}</p>
+            <h3 className="text-sm font-semibold text-red-800">Falha no processamento</h3>
+            <p className="text-sm text-red-700 mt-1 leading-relaxed">{error}</p>
           </div>
         </div>
       )}
